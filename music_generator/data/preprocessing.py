@@ -1,9 +1,10 @@
 from pathlib import Path
+from pprint import pprint
 from music21 import chord, converter, instrument, note
-from typing import List
+from typing import Dict, List, Tuple
 
 
-def load_midi_from_dir(midi_dir_parh: Path) -> List[List[str]]:
+def load_midi_from_dir(midi_dir_parh: Path) -> Tuple[List[List[str]], List[List[str]]]:
     notes = []
     durations = []
     for file in midi_dir_parh.glob('*.mid'):
@@ -12,6 +13,7 @@ def load_midi_from_dir(midi_dir_parh: Path) -> List[List[str]]:
         notes.append(n)
         durations.append(d)
     print(f"Load {len(notes)} MIDI files.")
+    return (notes, durations)
 
 
 def get_notes_and_durations(score) -> List[str]:
@@ -31,5 +33,25 @@ def get_notes_and_durations(score) -> List[str]:
     return notes, durations
 
 
+def create_lookup_dict(elements: List[List[str]]) -> Tuple[Dict[str, int], Dict[int, str]]:
+    unique_elements = set()
+    for element in elements:
+        unique_elements |= set(element)
+    unique_elements = sorted(unique_elements)
+    return (
+        {e: i for i, e in enumerate(unique_elements)},
+        {i: e for i, e in enumerate(unique_elements)},
+    )
+
+
+def create_dataset():
+    pass
+
+
 if __name__ == '__main__':
-    load_midi_from_dir(Path('resources'))
+    notes, durations = load_midi_from_dir(Path('resources'))
+    notes_to_int, int_to_notes = create_lookup_dict(notes)
+    durations_to_int, int_to_durations = create_lookup_dict(durations)
+
+    pprint(notes_to_int)
+    pprint(durations_to_int)
